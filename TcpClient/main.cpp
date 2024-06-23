@@ -21,8 +21,8 @@ int main(int argc, char *argv[])
     // Online w;
     // w.show();
 
-    TcpClient w;
-    w.show();
+    TcpClient::getInstance().show();
+    // w.show();
 
     // Friend w;
     // w.show();

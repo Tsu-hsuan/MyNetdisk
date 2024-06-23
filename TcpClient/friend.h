@@ -9,17 +9,26 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include "online.h"
+#include "protocol.h"
 
 class Friend : public QWidget
 {
     Q_OBJECT
 public:
     explicit Friend(QWidget *parent = nullptr);
+    void showAllOnlineUsr(PDU *pdu);
+
+    QString m_strSearchName;
+    QListWidget *getFriendList();
+
 
 signals:
 
 public slots:
     void showOnline();
+
+    void searchUsr();
+
 
 private:
     QTextEdit *m_pShowMSgTE;

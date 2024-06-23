@@ -57,6 +57,18 @@ void TcpClient::loadConfig()
 
 }
 
+TcpClient &TcpClient::getInstance()
+{
+    static TcpClient instance;
+    return instance;
+}
+
+QTcpSocket &TcpClient::getTcpSocket()
+{
+    return m_tcpSocket;
+}
+
+
 void TcpClient::showConnect()
 {
     QMessageBox::information(this, "连接服务器","连接服务器成功");
@@ -85,6 +97,30 @@ void TcpClient::recvMsg()
         }
         break;
     }
+    case ENUM_MSG_TYPE_DELETEUSR_RESPOND:
+    {
+        QMessageBox::information(this,"注销用户",pdu->caData);
+        break;
+    }
+    case ENUM_MSG_TYPE_ALL_ONLINE_RESPOND:
+    {
+        OpeWidget::getInstance().getFriend()->showAllOnlineUsr(pdu);
+
+        break;
+    }
+    case ENUM_MSG_TYPE_SEARCH_USR_RESPOND:
+    {
+        if(0==strcmp(SEARCH_USR_NO,pdu->caData)){
+            QMessageBox::information(this,"搜索",QString("%1: not exist").arg(OpeWidget::getInstance().getFriend()->m_strSearchName));
+        }else if (0==strcmp(SEARCH_USR_ONLINE,pdu->caData)){
+            QMessageBox::information(this,"搜索",QString("%1: online").arg(OpeWidget::getInstance().getFriend()->m_strSearchName));
+        }else if (0==strcmp(SEARCH_USR_OFFLINE,pdu->caData)){
+            QMessageBox::information(this,"搜索",QString("%1: offine").arg(OpeWidget::getInstance().getFriend()->m_strSearchName));
+        }
+        OpeWidget::getInstance().getFriend()->m_strSearchName = "";
+        break;
+    }
+
     default:
         break;
     }
@@ -93,27 +129,6 @@ void TcpClient::recvMsg()
     pdu = NULL;
 }
 
-#if 0
-void TcpClient::on_send_pb_clicked()
-{
-    QString strMsg = ui->lineEdit->text();
-    if (!strMsg.isEmpty())
-    {
-        PDU *pdu = mkPDU(strMsg.size());
-        pdu->uiMsgType = 888;
-        memcpy(pdu->caMsg, strMsg.toStdString().c_str(),strMsg.size());
-        qDebug() << (char*)(pdu->caMsg);
-        m_tcpSocket.write((char*)pdu, pdu->uiPDULen);
-        free(pdu);
-        pdu = NULL;
-    }
-    else
-    {
-        QMessageBox::warning(this,"信息发送","发送的信息不能为空");
-    }
-}
-
-#endif
 
 void TcpClient::on_login_pb_clicked()
 {

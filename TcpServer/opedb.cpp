@@ -17,7 +17,7 @@ OpeDB &OpeDB::getInstance()
 void OpeDB::init()
 {
     m_db.setHostName("localhost");
-    m_db.setDatabaseName("C:\\Users\\19182\\Desktop\\NetDisk\\MyNetDisk\\TcpServer\\cloud.db");
+    m_db.setDatabaseName("C:\\MyProject\\MyNetdisk-main\\TcpServer\\cloud.db");
     if (m_db.open())
     {
         QSqlQuery query;
@@ -89,4 +89,73 @@ void OpeDB::handleOffline(const char *name)
     QString data = QString("update usrInfo set online=0 where name=\'%1\'").arg(name);
     QSqlQuery query;
     query.exec(data);
+}
+
+bool OpeDB::handleDeleteUsr(const char *name,const char *pwd)
+{
+    if (NULL == name || NULL ==pwd){
+        return false;
+    }
+    QString data = QString("select * from usrInfo where name = \'%1\' and pwd = \'%2\' and online = 0").arg(name).arg(pwd);
+    qDebug() << data ;
+    QSqlQuery query;
+    query.exec(data);
+    if(query.next()){
+        data = QString("delete from friend where id = (select id from usrInfo where name = \'%1\')"
+                       "or friendId = (select id from usrInfo where name = \'%2\')").arg(name).arg(name);
+        qDebug() << data ;
+        query.exec(data);
+
+        data = QString("delete from usrInfo where name = \'%1\' ").arg(name);
+        qDebug() << data ;
+        query.exec(data);
+
+    }else{
+        return false;
+    }
+    return true;
+}
+
+QStringList OpeDB::handleAllOnline()
+{
+    QString data = QString("select name from usrInfo  where online = 1");
+    qDebug() << data ;
+    QSqlQuery query;
+    query.exec(data);
+    QStringList result;
+    result.clear();
+    while(query.next()){
+        result.append(query.value(0).toString());
+    }
+    return result;
+}
+
+void OpeDB::handleFirstBootOffine()
+{
+    QString data = QString("update usrInfo set online = 0 where 1=1");
+    QSqlQuery query;
+    query.exec(data);
+}
+
+int OpeDB::handleSearchUsr(const char *name)
+{
+    if(NULL==name){
+        return -1;
+    }
+    QString data = QString("select online from usrInfo where name =\'%1\'").arg(name);
+    QSqlQuery query;
+    query.exec(data);
+    if(query.next()){
+        int res = query.value(0).toInt();
+        if(1==res){
+            return 1;
+        }else if (0==res){
+            return 0;
+        }else{
+            return -1;
+        }
+    }else{
+        return -1;
+    }
+
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource prefix="i18n">
-<file alias="TcpClient_zh_CN.qm">C:/Users/19182/Desktop/NetDisk/MyNetDisk/TcpClient/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/debug/TcpClient_zh_CN.qm</file>
+<file alias="TcpClient_zh_CN.qm">C:/MyProject/MyNetdisk-main/TcpClient/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/debug/TcpClient_zh_CN.qm</file>
 </qresource>
 </RCC>

@@ -12,6 +12,12 @@ typedef unsigned int uint;
 #define LOGIN_OK "login ok"
 #define LOGIN_FAILED "login failed: name error or pwd error or relogin"
 
+#define DELETEUSER_SUCCESS "Deleteuser success"
+#define DELETEUSER_FAILED "Deleteuser failed : name or password error"
+
+#define SEARCH_USR_NO "no such people!"
+#define SEARCH_USR_ONLINE "online!"
+#define SEARCH_USR_OFFLINE "offine!"
 
 enum ENUM_MSG_TYPE
 {
@@ -23,14 +29,19 @@ enum ENUM_MSG_TYPE
     ENUM_MSG_TYPE_LOGIN_REQUEST,        // 登录请求
     ENUM_MSG_TYPE_LOGIN_RESPOND,        // 登录回复
 
-    // ENUM_MSG_TYPE_REQUEST,
-    // ENUM_MSG_TYPE_RESPOND,
-    // ENUM_MSG_TYPE_REQUEST,
-    // ENUM_MSG_TYPE_RESPOND,
-    // ENUM_MSG_TYPE_REQUEST,
-    // ENUM_MSG_TYPE_RESPOND,
-    // ENUM_MSG_TYPE_REQUEST,
-    // ENUM_MSG_TYPE_RESPOND,
+    ENUM_MSG_TYPE_DELETEUSER_REQUEST,   // 注销回复
+    ENUM_MSG_TYPE_DELETEUSER_RESPOND,   // 注销回复
+
+    ENUM_MSG_TYPE_ALL_ONLINE_REQUEST,   // 请求所有在线用户
+    ENUM_MSG_TYPE_ALL_ONLINE_RESPOND,   // 请求所有在线用户的回复
+
+    ENUM_MSG_TYPE_SEARCH_USR_REQUEST,   // 搜索请求
+    ENUM_MSG_TYPE_SEARCH_USR_RESPOND,   // 搜索回复
+
+    ENUM_MSG_TYPE_ADD_FRIEND_REQUEST,   // 添加好友请求
+    ENUM_MSG_TYPE_ADD_FRIEND_RESPOND,   // 添加好友回复
+    ENUM_MSG_TYPE_ADD_FRIEND_AGREE,   // 同意好友请求
+    ENUM_MSG_TYPE_ADD_FRIEND_REFUSE,   // 拒绝好友请求
 
     ENUM_MSG_TYPE_MAX = 0x00ffffff, // uint最大值 0xffffffff
 };

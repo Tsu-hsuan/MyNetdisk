@@ -29,3 +29,14 @@ OpeWidget &OpeWidget::getInstance()
     static OpeWidget instance;
     return instance;
 }
+
+Friend *OpeWidget::getFriend()
+{
+    return m_pFriend;
+}
+
+Book *OpeWidget::getBook()
+{
+    return m_pBook;
+}
+
