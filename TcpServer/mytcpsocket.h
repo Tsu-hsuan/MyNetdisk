@@ -3,6 +3,9 @@
 #include <QTcpSocket>
 #include "protocol.h"
 #include "opedb.h"
+#include<QDir>
+#include<QFile>
+#include<QTimer>
 
 class MyTcpSocket : public QTcpSocket
 {
@@ -21,6 +24,13 @@ public slots:
 
 private:
     QString m_strName;
+
+    QFile m_file;
+    qint64 m_iTotal;
+    qint64 m_iRecived;
+    bool m_bUpload;
+
+    QTimer *m_pTimer;
 };
 
 #endif // MYTCPSOCKET_H

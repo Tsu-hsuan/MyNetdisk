@@ -19,6 +19,13 @@ typedef unsigned int uint;
 #define SEARCH_USR_ONLINE "online!"
 #define SEARCH_USR_OFFLINE "offine!"
 
+#define UNKNOWN_ERROR "unknown error!"
+#define FRIEND_EXISTS "friend exists!"
+#define USER_NOT_EXISTS "user not exists!"
+#define USER_OFFINE "user offine!"
+
+#define DEL_FRIEND_OK "delete friend ok!"
+
 enum ENUM_MSG_TYPE
 {
     ENUM_MSG_TYPE_MIN = 0,
@@ -42,6 +49,12 @@ enum ENUM_MSG_TYPE
     ENUM_MSG_TYPE_ADD_FRIEND_RESPOND,   // 添加好友回复
     ENUM_MSG_TYPE_ADD_FRIEND_AGREE,   // 同意好友请求
     ENUM_MSG_TYPE_ADD_FRIEND_REFUSE,   // 拒绝好友请求
+
+    ENUM_MSG_TYPE_FRIEND_FLUSH_REQUEST,   // 刷新好友请求
+    ENUM_MSG_TYPE_FRIEND_FLUSH_RESPOND,   // 刷新好友回复
+
+    ENUM_MSG_TYPE_DELETE_FRIEND_REQUEST,   // 删除好友请求
+    ENUM_MSG_TYPE_DELETE_FRIEND_RESPOND,   // 删除好友复制
 
     ENUM_MSG_TYPE_MAX = 0x00ffffff, // uint最大值 0xffffffff
 };

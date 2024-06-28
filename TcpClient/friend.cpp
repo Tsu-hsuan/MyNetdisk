@@ -3,7 +3,8 @@
 #include "tcpclient.h"
 #include<QInputdialog.h>
 #include<QDebug>
-
+#include<QMessageBox>
+#include<QString>
 
 Friend::Friend(QWidget *parent)
     : QWidget{parent}
@@ -52,6 +53,14 @@ Friend::Friend(QWidget *parent)
             , this, SLOT(showOnline()));
     connect(m_pSearchUsrPB,SIGNAL(clicked(bool))
             ,this,SLOT(searchUsr()));
+    connect(m_pFlushFriendPB,SIGNAL(clicked(bool))
+            ,this,SLOT(flushFriend()));
+    connect(m_pDelFriendPB,SIGNAL(clicked(bool))
+            ,this,SLOT(delFriend()));
+    // connect(m_PrivateChatPB,SIGNAL(clicked(bool))
+    //         ,this,SLOT(privateChat()));
+    // connect(m_pMsgSendPB,SIGNAL(clicked(bool))
+    //         ,this,SLOT(groupChat()));
 }
 
 void Friend::showAllOnlineUsr(PDU *pdu)
@@ -87,6 +96,55 @@ void Friend::searchUsr()
         PDU *pdu = mkPDU(0);
         memcpy(pdu->caData,m_strSearchName.toStdString().c_str(),m_strSearchName.size());
         pdu->uiMsgType = ENUM_MSG_TYPE_SEARCH_USR_REQUEST;
+        TcpClient::getInstance().getTcpSocket().write((char*)pdu,pdu->uiPDULen);
+        free(pdu);
+        pdu=NULL;
+    }
+}
+
+void Friend::updateFriendList(PDU *pdu)
+{
+    if(NULL == pdu){
+        return ;
+    }else{
+        m_pFriendListWidget->clear();    // 清空状态
+    }
+    uint uiSize = pdu->uiMsgLen/32;
+    char caName[32] = {'\0'};
+    for(uint i=0;i<uiSize;i++){
+        memcpy(caName,(char*)(pdu->caMsg)+i*32,32);
+        m_pFriendListWidget->addItem(caName);
+        qDebug() << caName;
+    }
+    return ;
+}
+
+QListWidget *Friend::getFriendList()
+{
+    return m_pFriendListWidget;
+}
+
+void Friend::flushFriend()
+{
+    QString strName = TcpClient::getInstance().loginName();
+    PDU *pdu = mkPDU(0);
+    pdu->uiMsgType = ENUM_MSG_TYPE_FRIEND_FLUSH_REQUEST;
+    memcpy(pdu->caData,strName.toStdString().c_str(),strName.size());
+    TcpClient::getInstance().getTcpSocket().write((char*)pdu,pdu->uiPDULen);
+    free(pdu);
+    pdu=NULL;
+}
+
+void Friend::delFriend()
+{
+    if(NULL != m_pFriendListWidget->currentItem()){
+        QString strFriendName =  m_pFriendListWidget->currentItem()->text();
+        qDebug() << strFriendName ;
+        PDU *pdu = mkPDU(0);
+        pdu->uiMsgType = ENUM_MSG_TYPE_DELETE_FRIEND_REQUEST;
+        QString selfName = TcpClient::getInstance().loginName();
+        memcpy(pdu->caData,selfName.toStdString().c_str(),selfName.size());
+        memcpy(pdu->caData+32,strFriendName.toStdString().c_str(),strFriendName.size());
         TcpClient::getInstance().getTcpSocket().write((char*)pdu,pdu->uiPDULen);
         free(pdu);
         pdu=NULL;

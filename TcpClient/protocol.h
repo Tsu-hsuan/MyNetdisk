@@ -6,6 +6,7 @@
 #include <string.h>
 
 typedef unsigned int uint;
+
 #define REGIST_OK "regist ok"
 #define REGIST_FAILED "regist failed: name exited"
 #define LOGIN_OK "login ok"
@@ -14,6 +15,13 @@ typedef unsigned int uint;
 #define SEARCH_USR_NO "no such people!"
 #define SEARCH_USR_ONLINE "online!"
 #define SEARCH_USR_OFFLINE "offine!"
+
+#define UNKNOWN_ERROR "unknown error!"
+#define FRIEND_EXISTS "friend exists!"
+#define USER_NOT_EXISTS "user not exists!"
+#define USER_OFFINE "user offine!"
+
+#define DEL_FRIEND_OK "delete friend ok!"
 
 enum ENUM_MSG_TYPE
 {
@@ -37,6 +45,20 @@ enum ENUM_MSG_TYPE
     ENUM_MSG_TYPE_ADD_FRIEND_RESPOND,   // 添加好友回复
     ENUM_MSG_TYPE_ADD_FRIEND_AGREE,   // 同意好友请求
     ENUM_MSG_TYPE_ADD_FRIEND_REFUSE,   // 拒绝好友请求
+
+    ENUM_MSG_TYPE_FRIEND_FLUSH_REQUEST,   // 刷新好友请求
+    ENUM_MSG_TYPE_FRIEND_FLUSH_RESPOND,   // 刷新好友回复
+
+    ENUM_MSG_TYPE_DELETE_FRIEND_REQUEST,   // 删除好友请求
+    ENUM_MSG_TYPE_DELETE_FRIEND_RESPOND,   // 删除好友复制
+
+    ENUM_MSG_TYPE_PRIVATE_CHAT_REQUEST,   // 私聊请求
+    ENUM_MSG_TYPE_PRIVATE_CHAT_RESPOND,   // 私聊回复
+
+    ENUM_MSG_TYPE_GROUP_CHAT_REQUEST,   // 群聊请求
+    ENUM_MSG_TYPE_GROUP_CHAT_RESPOND,   // 群聊回复
+
+
     ENUM_MSG_TYPE_MAX = 0X00ffffff,
 };
 

@@ -49,6 +49,9 @@ private:
 
     //连接服务器，和服务器数据交互
     QTcpSocket m_tcpSocket;
+    QString m_strLoginName;
+
+    QString m_strCurPath;
     QFile m_file;
 
 };

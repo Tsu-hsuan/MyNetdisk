@@ -1,6 +1,9 @@
 #include "mytcpsocket.h"
 #include <QDebug>
-#include "opedb.h"
+#include<stdio.h>
+#include"mytcpserver.h"
+#include "protocol.h"
+#include <QFileInfoList>
 
 MyTcpSocket::MyTcpSocket(QObject *parent)
     : QTcpSocket{parent}
@@ -9,6 +12,8 @@ MyTcpSocket::MyTcpSocket(QObject *parent)
             , this, SLOT(recvMsg()));
     connect(this, SIGNAL(disconnected())
             , this, SLOT(clientOffline()));
+    connect(m_pTimer,SIGNAL(timeout()),this,SLOT(sendFileToClient()));
+
 }
 
 QString MyTcpSocket::getName()
@@ -110,6 +115,106 @@ void MyTcpSocket::recvMsg()
 
         free(respdu);
         respdu = NULL;
+        break;
+    }
+    case ENUM_MSG_TYPE_ADD_FRIEND_REQUEST:
+    {
+        char caPerName[32] = {'\0'};
+        char caName[32] = {'\0'};
+        strncpy(caPerName,pdu->caData,32);
+        strncpy(caName,pdu->caData+32,32);
+        int res = OpeDB::getInstance().handAddFriend(caPerName,caName);
+        PDU *respdu = NULL;
+        if(-1==res){
+            respdu = mkPDU(0);
+            respdu->uiMsgType = ENUM_MSG_TYPE_ADD_FRIEND_REQUEST;
+            strcpy(respdu->caData,UNKNOWN_ERROR);
+            write((char*)respdu,respdu->uiPDULen);
+            free(respdu);
+            respdu = NULL;
+        }else if(0==res){
+            respdu = mkPDU(0);
+            respdu->uiMsgType = ENUM_MSG_TYPE_ADD_FRIEND_REQUEST;
+            strcpy(respdu->caData,FRIEND_EXISTS);
+            write((char*)respdu,respdu->uiPDULen);
+            free(respdu);
+            respdu = NULL;
+        }else if(1==res){
+            MyTcpServer::getInstance().resend(caPerName,pdu);
+        }else if(2==res){
+            respdu = mkPDU(0);
+            respdu->uiMsgType = ENUM_MSG_TYPE_ADD_FRIEND_REQUEST;
+            strcpy(respdu->caData,USER_OFFINE);
+            write((char*)respdu,respdu->uiPDULen);
+            free(respdu);
+            respdu = NULL;
+        }else if(3==res){
+            respdu = mkPDU(0);
+            respdu->uiMsgType = ENUM_MSG_TYPE_ADD_FRIEND_REQUEST;
+            strcpy(respdu->caData,USER_NOT_EXISTS);
+            write((char*)respdu,respdu->uiPDULen);
+            free(respdu);
+            respdu = NULL;
+        }else{
+            respdu = mkPDU(0);
+            respdu->uiMsgType = ENUM_MSG_TYPE_ADD_FRIEND_REQUEST;
+            strcpy(respdu->caData,UNKNOWN_ERROR);
+            write((char*)respdu,respdu->uiPDULen);
+            free(respdu);
+            respdu = NULL;
+        }
+        break;
+    }
+    case ENUM_MSG_TYPE_ADD_FRIEND_AGREE:
+    {
+        char caPerName[32] = {'\0'};
+        char caName[32] = {'\0'};
+        strncpy(caPerName,pdu->caData,32);
+        strncpy(caName,pdu->caData+32,32);
+        OpeDB::getInstance().handleAgreeAddFriend(caPerName,caName);
+        MyTcpServer::getInstance().resend(caName,pdu);
+        break;
+    }
+    case ENUM_MSG_TYPE_ADD_FRIEND_REFUSE:
+    {
+        char caName[32]= {'\0'};
+        strncpy(caName,pdu->caData+32,32);
+        MyTcpServer::getInstance().resend(caName,pdu);
+        break;
+    }
+    case ENUM_MSG_TYPE_FRIEND_FLUSH_REQUEST:
+    {
+        char caName[32] = {'\0'};
+        strncpy(caName,pdu->caData,32);
+        QStringList res = OpeDB::getInstance().handFlushFriend(caName);
+        uint uiMsgLen = res.size() * 32 ;
+        PDU *respdu = mkPDU(uiMsgLen);
+        respdu->uiMsgType = ENUM_MSG_TYPE_FRIEND_FLUSH_RESPOND;
+        for(int i=0;i<res.size();i++){
+            memcpy((char*)(respdu->caMsg)+i*32,res.at(i).toStdString().c_str(),res.at(i).size());
+        }
+        write((char*)respdu,respdu->uiPDULen);
+        free(respdu);
+        respdu = NULL;
+        break;
+    }
+    case ENUM_MSG_TYPE_DELETE_FRIEND_REQUEST:
+    {
+        char selfName[32] = {'\0'};
+        char friendName[32] = {'\0'};
+        strncpy(selfName,pdu->caData,32);
+        strncpy(friendName,pdu->caData+32,32);
+        OpeDB::getInstance().handledelFriend(selfName,friendName);
+
+        PDU *respdu = mkPDU(0);
+        respdu->uiMsgType = ENUM_MSG_TYPE_DELETE_FRIEND_RESPOND;
+        strcpy(respdu->caData,DEL_FRIEND_OK);
+        write((char*)respdu,respdu->uiPDULen);
+        free(respdu);
+        respdu = NULL;
+
+        MyTcpServer::getInstance().resend(friendName,pdu);
+
         break;
     }
 
